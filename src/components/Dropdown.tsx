@@ -13,7 +13,6 @@ const Dropdown: React.FC<DropdownProps> = ({itemsList}) => {
     const context = useContext(FormContext)
 
     const handleItemSelect = (item: Item) => {
-        console.log(item)
         context.setSearchTarget(item)
     }
  
