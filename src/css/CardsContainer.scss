@@ -1,0 +1,21 @@
+
+.cards-container {
+    max-width: 700px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    .card {
+        margin: 1rem;
+        padding: 1rem;
+        background-color: white;
+        border: 1px solid #80808078;
+        border-radius: 5px;
+        text-align: start;
+        .flag {
+            width: 30px;
+        }
+        img {
+            width: 100%;
+            border-radius: 5px;
+        }
+    }
+}
