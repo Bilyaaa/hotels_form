@@ -12,3 +12,29 @@ export interface Country {
     id: string,
     flag: string
 } 
+
+export interface HotelInfo {
+    cityId: number,
+    cityName: string,
+    countryId: string,
+    countryName: string,
+    id: number,
+    img: string,
+    name: string
+}
+
+export interface PriceInfo {
+    amount: number,
+    currency: string,
+    endDate: string,
+    hotelID: string,
+    id: string,
+    startDate: string
+}
+
+export interface TourInfo {
+    hotelInfo: HotelInfo,
+    priceInfo: PriceInfo,
+    countryInfo: Country
+}
+

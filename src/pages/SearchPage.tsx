@@ -1,12 +1,12 @@
 
 import React, { useEffect, useState, useRef } from "react"
-import { getCountries, startSearchPrices, getSearchPrices } from "../api/api.js"
+import { getCountries, startSearchPrices, getSearchPrices, getHotels } from "../api/api.js"
 import "../css/SearchForm.scss"
 import SearchInput from "../components/SearchInput"
 import Dropdown from "../components/Dropdown"
 import { FormContext } from "../components/context"
-import { Country, Item } from "../components/models"
-import { Link } from "react-router-dom"
+import { Country, HotelInfo, Item } from "../components/models"
+import CardsContainer from "../components/CardsContainer"
 
 
 const SearchPage: React.FC = () =>  {
@@ -14,6 +14,10 @@ const SearchPage: React.FC = () =>  {
     const [defaultList, setDefaultList] = useState<Country[]>([])
     const isSearching = useRef(false)
     const searchPrices = useRef([])
+    const countryId = useRef<string>('')
+    const activeToken = useRef('')
+    const [hotels, setHotels] = useState<HotelInfo[]>([])
+    const [tours, setTours] = useState<object[]>([])
 
     useEffect(() => {       
         const fetchDefaultList = async () => {
@@ -24,15 +28,36 @@ const SearchPage: React.FC = () =>  {
         fetchDefaultList()
     },[])
 
+    useEffect(() => {
+        const res = Object.values(searchPrices)
+        const prices = Object.values(res[0])
+        const filteredItems: Array<object> = []
+        const targetCountry =  defaultList.find((country) => {return country.id === countryId.current})
+        for (let i = 0; i < hotels.length; i++) {
+            for(let j = 0; j < prices.length; j++) {
+                if (hotels[i].id === Number(prices[j].hotelID)) {
+                    filteredItems.push({hotelInfo: hotels[i], priceInfo: prices[j], countryInfo: targetCountry})
+                }
+            }
+        }
+        setTours(filteredItems)
+        console.log(targetCountry)
+    }, [hotels])
+
 
     const SearchForm: React.FC = () => {
 
         const [isDropdownVisible, setIsDropdownVisible] = useState(Boolean)
         const [searchResults, setSearchResults] = useState<Item[]>([])
         const [searchTarget, setSearchTarget] = useState<Item | null>(null)
-        const [activeToken, setActiveToken] = useState("")
         const [messageWindow, setMessageWindow] = useState({isVisible: false, message: ""})
-        const searchTimeout = useRef<number | null>(null);        
+        const searchTimeout = useRef<number | null>(null);  
+        
+        const getHotelsList = async (countryId: string) => {
+            const res = await getHotels(countryId)
+            const data = await res.json()
+            setHotels(Object.values(data))
+        }
 
         const startSearch = async (searchTarget) => {
             if (searchTarget === null) {
@@ -44,13 +69,14 @@ const SearchPage: React.FC = () =>  {
                 return
             }
             setMessageWindow({isVisible: true, message: "пошук..."})
-            let countryId
-            searchTarget.countryId ? countryId = searchTarget.countryId : countryId = searchTarget.id
-            const res = await startSearchPrices(countryId)
+            let id
+            searchTarget.countryId ? id = searchTarget.countryId : id = searchTarget.id
+            countryId.current = id
+            const res = await startSearchPrices(id)
             if (res.status !== 200) console.log('error')
             const data = await res.json()  
             const token = data.token
-            setActiveToken(data.token)
+            activeToken.current = data.token
             const waitTime = (new Date(data.waitUntil).getTime()) - Date.now()
             setTimeout(() => {
                 let tries = 0
@@ -67,6 +93,8 @@ const SearchPage: React.FC = () =>  {
                     } else if (Object.keys(data.prices).length !== 0) {
                         setMessageWindow({isVisible: false, message: ""})
                         searchPrices.current = data.prices
+                        console.log(countryId.current)
+                        getHotelsList(countryId.current)
                         return
                     }
                     else {   
@@ -114,11 +142,13 @@ const SearchPage: React.FC = () =>  {
                     {messageWindow.isVisible === true && <div className="message">{messageWindow.message}</div>}            
             </form>
            </FormContext.Provider>
+        
         )
     }
     return (
     <>
         <SearchForm/>
+        {tours.length > 0 && <CardsContainer cardsList={tours}/>}
     </>
   );
 }
