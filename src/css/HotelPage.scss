@@ -1,0 +1,89 @@
+
+.card-wrapper {
+    .cards-container {
+        display: block;   
+            .card {
+            width: 100%;
+            padding: 2rem;
+            * {
+                display: none;
+            }
+            .extended-info {
+                display: inline-block;
+            }
+            .extended-info.hotel-name {
+                font-size: 2rem;
+            }           
+            .location-wrapper {
+                display: flex;
+                align-items: center;
+                margin-bottom: 1rem;
+                .location-img {
+                    width: 15px;
+                    margin-right: .5rem;
+                }
+                .city-img {
+                    width: 22px;
+                    margin-right: .5rem;
+                }
+
+                h5 {
+                    margin-right: 1rem;
+                    font-weight: 400;
+                }           
+            }
+            .hotel-description {
+                h5 {
+                    font-size: 1rem;
+                    font-weight: 300;
+                    line-height: 1.5;
+                }
+            }
+            .services-wrapper {
+                display: flex;
+                align-items: center;
+                padding-bottom: 1.5rem;
+                border-bottom: 1px solid #80808052;
+                div {
+                    display: flex;
+                    align-items: center;
+                    margin-right: 1.5rem;
+                    img {
+                        width: 20px;
+                        margin-right: .5rem;
+                    }
+                    h5 {
+                        font-size: 1rem;
+                        font-weight: 400;
+                    }
+                }
+            }
+            .date-wrapper{
+                margin-top: 1.5rem;
+                display: flex;
+                align-items: center;
+                img {
+                    width: 20px;
+                    margin-right: .5rem;
+                }
+                h5 {
+                    font-size: 1rem;
+                    font-weight: 400;
+                }
+            }
+            .price-wrapper {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                h4 {
+                    font-size: 3rem;
+                }
+                a {
+                    padding: 1rem 1.5rem;
+                    background-color: #80808052;
+                    border-radius: 5px;
+                }
+            }
+        }       
+    } 
+}

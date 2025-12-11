@@ -41,9 +41,7 @@ const SearchPage: React.FC = () =>  {
             }
         }
         setTours(filteredItems)
-        console.log(targetCountry)
     }, [hotels])
-
 
     const SearchForm: React.FC = () => {
 
@@ -59,7 +57,7 @@ const SearchPage: React.FC = () =>  {
             setHotels(Object.values(data))
         }
 
-        const startSearch = async (searchTarget) => {
+        const startSearch = async (searchTarget: Item | null) => {
             if (searchTarget === null) {
                 setTimeout(() => isSearching.current = false, 0 ) 
                 setMessageWindow({isVisible: true, message: "За вашим пошуком турів не знайдено"})
@@ -141,8 +139,7 @@ const SearchPage: React.FC = () =>  {
                     <button>Знайти</button> 
                     {messageWindow.isVisible === true && <div className="message">{messageWindow.message}</div>}            
             </form>
-           </FormContext.Provider>
-        
+           </FormContext.Provider>       
         )
     }
     return (

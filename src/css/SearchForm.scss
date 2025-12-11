@@ -5,7 +5,12 @@ body {
     background-color: #8080804f;
 }
 
+.extended-info {
+    display: none;
+}
+
 form {
+    width: fit-content;
     position: relative;
     display: flex;
     flex-direction: column;
