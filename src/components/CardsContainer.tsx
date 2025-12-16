@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import "../css/CardsContainer.scss"
-import { TourInfo } from "./models";
+import { TourInfo, CardContainerProps } from "./models";
 import locationImg from "../img/location.png"
 import cityImg from "../img/city.png"
 import wifiImg from "../img/wifi.png"
@@ -12,9 +12,9 @@ import aquaparkImg from "../img/aquapark.png"
 import dateImg from "../img/date.png"
 
 
-const CardsContainer: React.FC = (props) => {
+const CardsContainer: React.FC<CardContainerProps> =  ({ cardsList }) => {
 
-    const list: TourInfo[] = props.cardsList
+    const list: TourInfo[] = cardsList
     return(
         <div className="cards-container">
             {list.map((card) => (

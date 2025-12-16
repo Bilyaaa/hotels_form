@@ -20,7 +20,9 @@ export interface HotelInfo {
     countryName: string,
     id: number,
     img: string,
-    name: string
+    name: string,
+    description?: string,
+    services: string
 }
 
 export interface PriceInfo {
@@ -36,5 +38,9 @@ export interface TourInfo {
     hotelInfo: HotelInfo,
     priceInfo: PriceInfo,
     countryInfo: Country
+}
+
+export interface CardContainerProps {
+    cardsList: TourInfo[]
 }
 

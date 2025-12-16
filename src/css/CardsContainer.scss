@@ -1,9 +1,11 @@
 
 .cards-container {
+    position: relative;
     max-width: 700px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     box-sizing: border-box;
+
     .card {
         margin: 1rem;
         padding: 1rem;

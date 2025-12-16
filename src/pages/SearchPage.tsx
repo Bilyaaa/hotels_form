@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, useRef } from "react"
-import { getCountries, startSearchPrices, getSearchPrices, getHotels } from "../api/api.js"
+import { getCountries, startSearchPrices, getSearchPrices, getHotels, stopSearchPrices } from "../api/api.js"
 import "../css/SearchForm.scss"
 import SearchInput from "../components/SearchInput"
 import Dropdown from "../components/Dropdown"
@@ -9,15 +9,16 @@ import { Country, HotelInfo, Item } from "../components/models"
 import CardsContainer from "../components/CardsContainer"
 
 
-const SearchPage: React.FC = () =>  {
+const SearchPage: React.FC = () => {
 
     const [defaultList, setDefaultList] = useState<Country[]>([])
-    const isSearching = useRef(false)
+    const isSearching = useRef<boolean>(false)
     const searchPrices = useRef([])
     const countryId = useRef<string>('')
-    const activeToken = useRef('')
+    const activeToken = useRef<string>('')
     const [hotels, setHotels] = useState<HotelInfo[]>([])
     const [tours, setTours] = useState<object[]>([])
+
 
     useEffect(() => {       
         const fetchDefaultList = async () => {
@@ -41,15 +42,20 @@ const SearchPage: React.FC = () =>  {
             }
         }
         setTours(filteredItems)
-    }, [hotels])
+    }, [defaultList, hotels])
 
     const SearchForm: React.FC = () => {
 
         const [isDropdownVisible, setIsDropdownVisible] = useState(Boolean)
         const [searchResults, setSearchResults] = useState<Item[]>([])
         const [searchTarget, setSearchTarget] = useState<Item | null>(null)
-        const [messageWindow, setMessageWindow] = useState({isVisible: false, message: ""})
         const searchTimeout = useRef<number | null>(null);  
+        const [messageWindow, setMessageWindow] = useState({isVisible: false, message: ""})
+
+
+        useEffect(() => {
+            if(isSearching.current === true) setMessageWindow({isVisible: true, message: "пошук..."})
+        }, [tours])
         
         const getHotelsList = async (countryId: string) => {
             const res = await getHotels(countryId)
@@ -67,9 +73,8 @@ const SearchPage: React.FC = () =>  {
                 return
             }
             setMessageWindow({isVisible: true, message: "пошук..."})
-            let id
-            searchTarget.countryId ? id = searchTarget.countryId : id = searchTarget.id
-            countryId.current = id
+            let id = searchTarget.countryId || searchTarget.id
+            countryId.current = id  
             const res = await startSearchPrices(id)
             if (res.status !== 200) console.log('error')
             const data = await res.json()  
@@ -77,6 +82,7 @@ const SearchPage: React.FC = () =>  {
             activeToken.current = data.token
             const waitTime = (new Date(data.waitUntil).getTime()) - Date.now()
             setTimeout(() => {
+
                 let tries = 0
                 const getSearchP = async () => {
                     const res = await getSearchPrices(token)
@@ -91,7 +97,6 @@ const SearchPage: React.FC = () =>  {
                     } else if (Object.keys(data.prices).length !== 0) {
                         setMessageWindow({isVisible: false, message: ""})
                         searchPrices.current = data.prices
-                        console.log(countryId.current)
                         getHotelsList(countryId.current)
                         return
                     }
@@ -107,11 +112,32 @@ const SearchPage: React.FC = () =>  {
             }, waitTime)
         }
 
-        const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {        
-            e.preventDefault()            
-            startSearch(searchTarget)
-            isSearching.current = true
+        const stopSearch = () => {
+
+            clearTimeout(searchTimeout.current)  
+            searchTimeout.current = null
+            stopSearchPrices(activeToken.current).then((res: { json: () => object }) => res.json()).then(() => {
+            activeToken.current = ""
+            setTours([])
+                }).then(() => {                   
+                    startSearch(searchTarget)
+                    isSearching.current = true                          
+                }
+            )
         }
+
+        const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+                        e.preventDefault()
+            if (activeToken.current !== "" && messageWindow.isVisible === true) {
+                stopSearch()
+            } else {
+                startSearch(searchTarget)
+                isSearching.current = true
+            }  
+        }         
+     
+
+        
 
         return (
         <FormContext.Provider 
@@ -123,7 +149,7 @@ const SearchPage: React.FC = () =>  {
             searchTarget,
             setSearchTarget
             }}>
-            <form onSubmit={(e) => {handleFormSubmit(e) }}>
+            <form onSubmit={(e) => {handleFormSubmit(e)}}>
             {isSearching.current === true && (<div className="disable-form"></div>)}
             <h2>Форма пошуку турів</h2>
                 {searchTarget && <div 
@@ -136,16 +162,16 @@ const SearchPage: React.FC = () =>  {
                 {searchTarget === null && <SearchInput/>}               
                 {isDropdownVisible === true && <Dropdown itemsList={searchResults.length === 0 ? defaultList : searchResults}/>}          
 
-                    <button>Знайти</button> 
-                    {messageWindow.isVisible === true && <div className="message">{messageWindow.message}</div>}            
+                    <button type="submit" >Знайти</button> 
+                {messageWindow.isVisible === true && <div className="message">{messageWindow.message}</div>}            
             </form>
            </FormContext.Provider>       
         )
     }
     return (
     <>
-        <SearchForm/>
-        {tours.length > 0 && <CardsContainer cardsList={tours}/>}
+            <SearchForm />
+            {tours.length > 0 && <CardsContainer cardsList={tours}/>}
     </>
   );
 }

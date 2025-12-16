@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { useContext, useRef } from "react";
 import { FormContext } from "../components/context";
 import { searchGeo } from "../api/api.js"
@@ -25,7 +25,7 @@ const SearchInput: React.FC = () => {
                 fetchResults(value)
             }, 400) 
         }
-    }
+    }  
 
     const handleInputClick = (e: React.MouseEvent<HTMLInputElement, MouseEvent>) => {
         e.preventDefault()

@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom";
 import CardsContainer from "../components/CardsContainer";
 import { getPrice, getHotel } from "../api/api.js"
